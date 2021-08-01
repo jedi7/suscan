@@ -552,7 +552,8 @@ suscan_remote_read(
     SU_TRYCATCH(poll(fds, 2, timeout_ms) != -1, return -1);
 
     if (fds[1].revents & POLLIN) {
-      (void) read(cancelfd, &cancel_byte, 1);
+      int ignore_result __attribute__((unused));
+      ignore_result = read(cancelfd, &cancel_byte, 1);
       errno = ECANCELED;
       return -1;
     } else if (fds[0].revents & POLLIN) {
@@ -803,7 +804,8 @@ suscan_remote_analyzer_network_connect_cancellable(
       default:
         if (fds[1].revents & POLLIN) {
           /* Cancel requested */
-          (void) read(cancelfd, &cancel_byte, 1);
+          int ignore_result __attribute__((unused));
+          ignore_result = read(cancelfd, &cancel_byte, 1);
           ret = -1;
           errno = ECANCELED;
           goto done;
@@ -1348,7 +1350,8 @@ suscan_remote_analyzer_dtor(void *ptr)
 
   if (self->tx_thread_init) {
     if (self->rx_thread_init) {
-      write(self->cancel_pipe[1], &b, 1);
+      int ignore_result __attribute__((unused));
+      ignore_result = write(self->cancel_pipe[1], &b, 1);
       pthread_join(self->rx_thread, NULL);
     }
 
@@ -1889,4 +1892,3 @@ suscan_remote_analyzer_get_interface(void)
 }
 
 #undef SET_CALLBACK
-
